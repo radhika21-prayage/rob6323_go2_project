@@ -213,6 +213,7 @@ class Rob6323Go2Env(DirectRLEnv):
             ],
             dim=-1,
         )
+        self.extras = {}
         return {"policy": obs}
 
     def _get_rewards(self) -> torch.Tensor:
@@ -373,13 +374,29 @@ class Rob6323Go2Env(DirectRLEnv):
             extras["Episode_Reward/" + key] = episodic_sum_avg / self.max_episode_length_s
             self._episode_sums[key][env_ids] = 0.0
 
-        self.extras["log"] = dict()
+# Logging (put scalars in BOTH keys: "episode" and "log")
+# Different wrappers/runners look at different keys.
+        self.extras.setdefault("log", {})
+        self.extras.setdefault("episode", {})
+        
+        # reward terms
+        extras = {}
+        for key in self._episode_sums.keys():
+            episodic_sum_avg = torch.mean(self._episode_sums[key][env_ids])
+            extras["Episode_Reward/" + key] = episodic_sum_avg / self.max_episode_length_s
+            self._episode_sums[key][env_ids] = 0.0
+        
         self.extras["log"].update(extras)
-
-        extras = dict()
+        self.extras["episode"].update(extras)
+        
+        # termination counts
+        extras = {}
         extras["Episode_Termination/base_contact"] = torch.count_nonzero(self.reset_terminated[env_ids]).item()
         extras["Episode_Termination/time_out"] = torch.count_nonzero(self.reset_time_outs[env_ids]).item()
+        
         self.extras["log"].update(extras)
+        self.extras["episode"].update(extras)
+
 
         # Reset last actions hist
         self.last_actions[env_ids] = 0.0
