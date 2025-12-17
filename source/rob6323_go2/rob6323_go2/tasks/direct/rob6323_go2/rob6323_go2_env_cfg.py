@@ -1,6 +1,6 @@
 # Copyright (c) 2022-2025, The Isaac Lab Project Developers
 # All rights reserved.
-#
+# rob6323_go2_env_cfg.py
 # SPDX-License-Identifier: BSD-3-Clause
 
 from isaaclab_assets.robots.unitree import UNITREE_GO2_CFG
@@ -31,7 +31,9 @@ class Rob6323Go2EnvCfg(DirectRLEnvCfg):
     observation_space = 48 + 4  # Added 4 for clock inputs
     state_space = 0
 
-    debug_vis = False
+    # IMPORTANT: enable arrows for rubric video check
+    debug_vis = True
+
     base_height_min = 0.05  # Terminate if base is lower than this
 
     # -----------------------------
@@ -47,7 +49,9 @@ class Rob6323Go2EnvCfg(DirectRLEnvCfg):
     # PD control gains
     Kp = 20.0
     Kd = 0.5
-    torque_limits = 100.0
+
+    # IMPORTANT: match actuator effort_limit (prevents mismatched clipping/penalty)
+    torque_limits = 23.5
 
     # simulation
     sim: SimulationCfg = SimulationCfg(
