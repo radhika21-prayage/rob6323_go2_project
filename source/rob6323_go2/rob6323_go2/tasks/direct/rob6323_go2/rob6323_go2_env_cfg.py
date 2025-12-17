@@ -31,7 +31,7 @@ class Rob6323Go2EnvCfg(DirectRLEnvCfg):
     observation_space = 48 + 4  # Added 4 for clock inputs
     state_space = 0
 
-    debug_vis = True
+    debug_vis = False
     base_height_min = 0.05  # Terminate if base is lower than this
 
     # -----------------------------
